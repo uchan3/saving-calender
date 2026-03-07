@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-**saving-calender** (節約カレンダー) — iOS app to track savings by recording resisted spending, visualizing it on a calendar, and maintaining savings streaks for motivation.
+**saving-calender** — iOS app to track savings by recording resisted spending, visualizing it on a calendar, and maintaining savings streaks for motivation.
 
 ### Key Features
 
@@ -55,9 +55,48 @@ assets/       # Images, fonts, icons
 ## Development Flow
 
 GitHub Flow:
+
 - `main` branch is always deployable
 - Create `feature/`, `fix/`, or `chore/` branches for all work
 - Submit PRs to merge back into `main`
+
+## Completion Criteria
+
+A task is considered complete only when **all** of the following local checks pass with zero errors.
+
+```bash
+# 1. TypeScript type check (no compile errors)
+npx tsc --noEmit
+
+# 2. ESLint (no warnings or errors)
+npm run lint
+
+# 3. Prettier format check (no diff)
+npm run format:check
+
+# 4. Tests (all tests pass)
+npm test
+```
+
+### Rules
+
+- All four checks above must pass with zero errors before marking a task as done.
+- While no test runner is set up, checks 1–3 are required. Once a test runner is introduced, check 4 becomes required as well.
+- Deleting or skipping existing tests to make checks pass is prohibited.
+- If test coverage is insufficient for the code you changed, add tests.
+
+### Commit Messages
+
+- Do NOT include `Co-Authored-By` or any AI attribution trailers in commit messages.
+
+### Testing Philosophy
+
+Follow the **classical (Detroit) school of testing**:
+
+- Prefer real objects over mocks. Use actual implementations whenever possible.
+- Mocks are only acceptable for **unmanaged external dependencies** (e.g., network APIs, Supabase calls). Never mock internal collaborators.
+- Test behavior and outcomes, not implementation details.
+- Verify the final result, not how the code arrived at it (avoid asserting on call counts or argument lists of internal functions).
 
 ## Coding Conventions
 
@@ -66,3 +105,4 @@ GitHub Flow:
 - Linting: ESLint with `@typescript-eslint` and `react-hooks` plugins (config in `eslint.config.mjs`)
 - Components should be small with single responsibilities
 - Environment variables must use `EXPO_PUBLIC_` prefix for client-side access
+- All codes and comments must be written in English even though prompt is Japanese

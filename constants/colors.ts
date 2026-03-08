@@ -1,0 +1,15 @@
+export const COLORS = {
+  saving: "#4CAF50",
+  savingLight: "#E8F5E9",
+  splurge: "#F44336",
+  splurgeLight: "#FFEBEE",
+  neutral: "#9E9E9E",
+  neutralLight: "#F5F5F5",
+  primary: "#2196F3",
+  primaryLight: "#E3F2FD",
+  background: "#FFFFFF",
+  text: "#212121",
+  textSecondary: "#757575",
+  border: "#E0E0E0",
+  streak: "#FF9800",
+} as const;

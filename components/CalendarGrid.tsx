@@ -66,7 +66,7 @@ export default function CalendarGrid({
             const isSelected = dateStr === selectedDate;
             const isToday = dateStr === today;
 
-            let bgColor: string = COLORS.background;
+            let bgColor: string = COLORS.surface;
             if (summary) {
               if (summary.net > 0) bgColor = COLORS.savingLight;
               else if (summary.net < 0) bgColor = COLORS.splurgeLight;

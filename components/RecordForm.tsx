@@ -183,7 +183,7 @@ const styles = StyleSheet.create({
     borderRadius: 20,
     borderWidth: 1,
     borderColor: COLORS.border,
-    backgroundColor: COLORS.background,
+    backgroundColor: COLORS.surface,
   },
   presetChipActive: {
     backgroundColor: COLORS.primaryLight,

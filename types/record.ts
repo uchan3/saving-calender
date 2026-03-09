@@ -16,3 +16,21 @@ export interface DailySummary {
   totalSplurge: number;
   net: number; // totalSaving - totalSplurge
 }
+
+export interface QuickPreset {
+  id: string;
+  emoji: string;
+  label: string;
+  type: RecordType;
+  amount: number;
+  order: number;
+}
+
+export interface SavingsGoal {
+  id: string;
+  targetAmount: number;
+  period: "monthly";
+  year: number;
+  month: number;
+  createdAt: string;
+}

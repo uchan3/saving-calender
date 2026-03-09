@@ -1,20 +1,14 @@
 import React, { useCallback, useMemo, useState } from "react";
 import { Modal, ScrollView, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import CalendarGrid from "../components/CalendarGrid";
-import DayDetail from "../components/DayDetail";
-import RecordForm from "../components/RecordForm";
-import StreakBadge from "../components/StreakBadge";
-import { useRecords } from "../hooks/useRecords";
-import {
-  calculateStreak,
-  formatDate,
-  getDailySummariesForMonth,
-  getRecordsForDate,
-} from "../stores/recordStore";
-import { COLORS } from "../constants/colors";
+import CalendarGrid from "../../components/CalendarGrid";
+import DayDetail from "../../components/DayDetail";
+import RecordForm from "../../components/RecordForm";
+import { useRecords } from "../../hooks/useRecords";
+import { formatDate, getDailySummariesForMonth, getRecordsForDate } from "../../stores/recordStore";
+import { COLORS } from "../../constants/colors";
 
-export default function HomeScreen() {
+export default function CalendarScreen() {
   const { records, add, remove } = useRecords();
 
   const today = formatDate(new Date());
@@ -36,8 +30,6 @@ export default function HomeScreen() {
     [records, selectedDate],
   );
 
-  const streak = useMemo(() => calculateStreak(records), [records]);
-
   const goToPrevMonth = useCallback(() => {
     const prev = new Date(viewYear, viewMonth - 2, 1);
     setSelectedDate(formatDate(prev));
@@ -55,13 +47,7 @@ export default function HomeScreen() {
 
   return (
     <SafeAreaView style={styles.safeArea}>
-      <ScrollView style={styles.container}>
-        {/* Header */}
-        <View style={styles.header}>
-          <Text style={styles.appTitle}>Saving Calender</Text>
-          <StreakBadge streak={streak} />
-        </View>
-
+      <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
         {/* Month Navigation */}
         <View style={styles.monthNav}>
           <TouchableOpacity onPress={goToPrevMonth} testID="prev-month">
@@ -121,24 +107,12 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
   },
-  header: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    paddingHorizontal: 16,
-    paddingVertical: 12,
-  },
-  appTitle: {
-    fontSize: 22,
-    fontWeight: "bold",
-    color: COLORS.text,
-  },
   monthNav: {
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
     paddingHorizontal: 16,
-    paddingVertical: 8,
+    paddingVertical: 12,
   },
   navArrow: {
     fontSize: 18,

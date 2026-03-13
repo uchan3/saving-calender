@@ -1,44 +1,62 @@
-import AsyncStorage from "@react-native-async-storage/async-storage";
+import { supabase } from "../lib/supabase";
 import { SavingsGoal } from "../types/record";
 
-const GOAL_KEY = "savings_goals";
-
-function generateId(): string {
-  return Date.now().toString(36) + Math.random().toString(36).slice(2);
+interface GoalRow {
+  id: string;
+  target_amount: number;
+  period: string;
+  year: number;
+  month: number;
+  created_at: string;
 }
 
-export async function loadGoals(): Promise<SavingsGoal[]> {
-  const json = await AsyncStorage.getItem(GOAL_KEY);
-  if (!json) return [];
-  return JSON.parse(json) as SavingsGoal[];
+function mapGoal(row: GoalRow): SavingsGoal {
+  return {
+    id: row.id,
+    targetAmount: row.target_amount,
+    period: row.period as "monthly",
+    year: row.year,
+    month: row.month,
+    createdAt: row.created_at,
+  };
 }
 
 export async function loadGoal(year: number, month: number): Promise<SavingsGoal | null> {
-  const goals = await loadGoals();
-  return goals.find((g) => g.year === year && g.month === month) ?? null;
+  const { data, error } = await supabase
+    .from("goals")
+    .select("*")
+    .eq("year", year)
+    .eq("month", month)
+    .maybeSingle();
+
+  if (error) throw error;
+  if (!data) return null;
+  return mapGoal(data);
 }
 
-export async function saveGoal(year: number, month: number, amount: number): Promise<SavingsGoal> {
-  const goals = await loadGoals();
-  const existingIndex = goals.findIndex((g) => g.year === year && g.month === month);
+export async function saveGoal(
+  userId: string,
+  year: number,
+  month: number,
+  amount: number,
+): Promise<SavingsGoal> {
+  const { data, error } = await supabase
+    .from("goals")
+    .upsert(
+      {
+        user_id: userId,
+        target_amount: amount,
+        period: "monthly",
+        year,
+        month,
+      },
+      { onConflict: "user_id,year,month" },
+    )
+    .select()
+    .single();
 
-  const goal: SavingsGoal = {
-    id: existingIndex >= 0 ? goals[existingIndex].id : generateId(),
-    targetAmount: amount,
-    period: "monthly",
-    year,
-    month,
-    createdAt: existingIndex >= 0 ? goals[existingIndex].createdAt : new Date().toISOString(),
-  };
-
-  if (existingIndex >= 0) {
-    goals[existingIndex] = goal;
-  } else {
-    goals.push(goal);
-  }
-
-  await AsyncStorage.setItem(GOAL_KEY, JSON.stringify(goals));
-  return goal;
+  if (error) throw error;
+  return mapGoal(data);
 }
 
 export function getMonthlyNet(

@@ -49,7 +49,7 @@ assets/       # Images, fonts, icons
 ## Architecture
 
 - **Routing**: Expo Router (file-based routing in `app/` directory). `app/_layout.tsx` is the root layout.
-- **Supabase Client**: Initialized in `lib/supabase.ts`. Uses `EXPO_PUBLIC_SUPABASE_URL` and `EXPO_PUBLIC_SUPABASE_ANON_KEY` env vars (set in `.env`, see `.env.example`).
+- **Supabase Client**: Initialized in `lib/supabase.ts`. Uses `EXPO_PUBLIC_SUPABASE_URL` and `EXPO_PUBLIC_SUPABASE_PUBLISHABLE_KEY` env vars (set in `.env`, see `.env.example`).
 - **Auth**: Supabase Auth with session persistence via AsyncStorage.
 
 ## Development Flow

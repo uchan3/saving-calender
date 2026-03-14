@@ -1,49 +1,71 @@
-import AsyncStorage from "@react-native-async-storage/async-storage";
+import { supabase } from "../lib/supabase";
 import { SavingRecord, DailySummary, RecordType } from "../types/record";
 
-const STORAGE_KEY = "saving_records";
-
-function generateId(): string {
-  return Date.now().toString(36) + Math.random().toString(36).slice(2);
-}
+// --- Supabase CRUD ---
 
 export async function loadRecords(): Promise<SavingRecord[]> {
-  const json = await AsyncStorage.getItem(STORAGE_KEY);
-  if (!json) return [];
-  return JSON.parse(json) as SavingRecord[];
-}
+  const { data, error } = await supabase
+    .from("records")
+    .select("*")
+    .order("created_at", { ascending: true });
 
-async function saveRecords(records: SavingRecord[]): Promise<void> {
-  await AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(records));
+  if (error) throw error;
+  return (data ?? []).map(mapRecord);
 }
 
 export async function addRecord(
+  userId: string,
   type: RecordType,
   category: string,
   amount: number,
   date: string,
   note?: string,
 ): Promise<SavingRecord> {
-  const record: SavingRecord = {
-    id: generateId(),
-    type,
-    category,
-    amount,
-    date,
-    note,
-    createdAt: new Date().toISOString(),
-  };
-  const records = await loadRecords();
-  records.push(record);
-  await saveRecords(records);
-  return record;
+  const { data, error } = await supabase
+    .from("records")
+    .insert({
+      user_id: userId,
+      type,
+      category,
+      amount,
+      date,
+      note: note ?? null,
+    })
+    .select()
+    .single();
+
+  if (error) throw error;
+  return mapRecord(data);
 }
 
 export async function deleteRecord(id: string): Promise<void> {
-  const records = await loadRecords();
-  const filtered = records.filter((r) => r.id !== id);
-  await saveRecords(filtered);
+  const { error } = await supabase.from("records").delete().eq("id", id);
+  if (error) throw error;
 }
+
+interface RecordRow {
+  id: string;
+  type: string;
+  category: string;
+  amount: number;
+  date: string;
+  note: string | null;
+  created_at: string;
+}
+
+function mapRecord(row: RecordRow): SavingRecord {
+  return {
+    id: row.id,
+    type: row.type as RecordType,
+    category: row.category,
+    amount: row.amount,
+    date: row.date,
+    note: row.note ?? undefined,
+    createdAt: row.created_at,
+  };
+}
+
+// --- Pure functions (no Supabase dependency) ---
 
 export function getRecordsForDate(records: SavingRecord[], date: string): SavingRecord[] {
   return records.filter((r) => r.date === date);

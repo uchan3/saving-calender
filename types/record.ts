@@ -34,3 +34,14 @@ export interface SavingsGoal {
   month: number;
   createdAt: string;
 }
+
+export interface WishlistItem {
+  id: string;
+  name: string;
+  price: number;
+  imageUrl?: string;
+  productUrl?: string;
+  sortOrder: number;
+  purchasedAt?: string;
+  createdAt: string;
+}

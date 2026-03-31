@@ -38,6 +38,13 @@ export default function TabLayout() {
           tabBarIcon: () => <TabIcon label="📅" />,
         }}
       />
+      <Tabs.Screen
+        name="wishlist"
+        options={{
+          title: "Wishlist",
+          tabBarIcon: () => <TabIcon label="🎁" />,
+        }}
+      />
     </Tabs>
   );
 }

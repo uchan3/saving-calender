@@ -153,4 +153,14 @@ function formatDate(date: Date): string {
   return `${y}-${m}-${d}`;
 }
 
+/**
+ * Calculate cumulative net savings across all records.
+ *
+ * @param records - All saving records
+ * @returns Total savings minus total splurges
+ */
+export function getCumulativeNet(records: SavingRecord[]): number {
+  return records.reduce((sum, r) => sum + (r.type === "saving" ? r.amount : -r.amount), 0);
+}
+
 export { formatDate };

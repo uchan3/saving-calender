@@ -34,6 +34,16 @@ export const COLORS = {
   border: "#E0E0E0",
   divider: "#EEEEEE",
 
+  // Wishlist
+  wishlistUnlocked: "#2E7D32",
+  wishlistUnlockedBg: "#E8F5E9",
+  wishlistLocked: "#9E9E9E",
+  wishlistLockedBg: "#F5F5F5",
+  wishlistPurchased: "#1565C0",
+  wishlistPurchasedBg: "#E3F2FD",
+  wishlistNextBg: "#FFF8E1",
+  wishlistNextAccent: "#FF8F00",
+
   // Tab bar
   tabActive: "#2E7D32",
   tabInactive: "#9E9E9E",

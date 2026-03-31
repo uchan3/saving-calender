@@ -4,16 +4,24 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import StreakHero from "../../components/StreakHero";
 import TodayNet from "../../components/TodayNet";
 import GoalProgress from "../../components/GoalProgress";
+import WishlistProgress from "../../components/WishlistProgress";
 import QuickRecordGrid from "../../components/QuickRecordGrid";
 import RecordForm from "../../components/RecordForm";
 import { useRecords } from "../../hooks/useRecords";
 import { useGoal } from "../../hooks/useGoal";
+import { useWishlist } from "../../hooks/useWishlist";
 import {
   calculateStreak,
   formatDate,
+  getCumulativeNet,
   getDailySummary,
   getRecordsForDate,
 } from "../../stores/recordStore";
+import {
+  computeAvailableBalance,
+  computeUnlockStatus,
+  getNextUnlockItem,
+} from "../../stores/wishlistStore";
 import { getMonthlyNet } from "../../stores/goalStore";
 import { DEFAULT_QUICK_PRESETS } from "../../constants/quickPresets";
 import { QuickPreset } from "../../types/record";
@@ -28,6 +36,7 @@ export default function HomeScreen() {
   const currentMonth = now.getMonth() + 1;
 
   const { goal, set: setGoal } = useGoal(currentYear, currentMonth);
+  const { items: wishlistItems } = useWishlist();
 
   const [showForm, setShowForm] = useState(false);
   const [formDate, setFormDate] = useState(today);
@@ -36,6 +45,36 @@ export default function HomeScreen() {
   const todaySummary = useMemo(() => getDailySummary(records, today), [records, today]);
   const monthlyNet = getMonthlyNet(records, currentYear, currentMonth);
   const monthLabel = now.toLocaleDateString("en-US", { month: "long" });
+
+  const cumulativeNet = useMemo(() => getCumulativeNet(records), [records]);
+  const wishlistAvailableBalance = useMemo(
+    () => computeAvailableBalance(cumulativeNet, wishlistItems),
+    [cumulativeNet, wishlistItems],
+  );
+  const wishlistUnlockStatus = useMemo(
+    () => computeUnlockStatus(wishlistAvailableBalance, wishlistItems),
+    [wishlistAvailableBalance, wishlistItems],
+  );
+  const wishlistUnlockedCount = useMemo(
+    () =>
+      wishlistItems.filter((i) => i.purchasedAt == null && wishlistUnlockStatus.get(i.id)?.unlocked)
+        .length,
+    [wishlistItems, wishlistUnlockStatus],
+  );
+  const wishlistTotalCount = useMemo(
+    () => wishlistItems.filter((i) => i.purchasedAt == null).length,
+    [wishlistItems],
+  );
+  const nextUnlockItem = useMemo(
+    () => getNextUnlockItem(wishlistAvailableBalance, wishlistItems),
+    [wishlistAvailableBalance, wishlistItems],
+  );
+  const nextItemProgress = useMemo(() => {
+    if (!nextUnlockItem) return 0;
+    return nextUnlockItem.price > 0
+      ? Math.round(Math.min((wishlistAvailableBalance / nextUnlockItem.price) * 100, 100))
+      : 100;
+  }, [nextUnlockItem, wishlistAvailableBalance]);
 
   // Show recovery when streak is 0 and yesterday has no records
   const showRecovery = useMemo(() => {
@@ -86,6 +125,14 @@ export default function HomeScreen() {
           currentAmount={monthlyNet}
           monthLabel={monthLabel}
           onSetGoal={setGoal}
+        />
+
+        <WishlistProgress
+          availableBalance={wishlistAvailableBalance}
+          unlockedCount={wishlistUnlockedCount}
+          totalCount={wishlistTotalCount}
+          nextItem={nextUnlockItem}
+          nextItemProgress={nextItemProgress}
         />
 
         <QuickRecordGrid

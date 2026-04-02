@@ -136,14 +136,13 @@ export default function WishlistScreen() {
           unlocked={status.unlocked}
           progress={status.progress}
           onPress={handlePress}
-          onPurchase={purchase}
           onUnpurchase={unpurchase}
           onEdit={handleEdit}
           onDelete={remove}
         />
       );
     },
-    [unlockStatus, handlePress, purchase, unpurchase, handleEdit, remove],
+    [unlockStatus, handlePress, unpurchase, handleEdit, remove],
   );
 
   return (

@@ -8,7 +8,6 @@ interface WishlistItemCardProps {
   unlocked: boolean;
   progress: number;
   onPress: (item: WishlistItem) => void;
-  onPurchase: (id: string) => void;
   onUnpurchase: (id: string) => void;
   onEdit: (item: WishlistItem) => void;
   onDelete: (id: string) => void;
@@ -19,23 +18,11 @@ export default function WishlistItemCard({
   unlocked,
   progress,
   onPress,
-  onPurchase,
   onUnpurchase,
   onEdit,
   onDelete,
 }: WishlistItemCardProps) {
   const isPurchased = item.purchasedAt != null;
-
-  const handlePurchase = () => {
-    Alert.alert(
-      "Buy this item?",
-      `Mark "${item.name}" as purchased for ¥${item.price.toLocaleString()}?`,
-      [
-        { text: "Cancel", style: "cancel" },
-        { text: "Buy!", onPress: () => onPurchase(item.id) },
-      ],
-    );
-  };
 
   const handleDelete = () => {
     Alert.alert("Delete item?", `Remove "${item.name}" from your wishlist?`, [
@@ -85,7 +72,7 @@ export default function WishlistItemCard({
           <View style={styles.actions}>
             <TouchableOpacity
               style={styles.buyBtn}
-              onPress={handlePurchase}
+              onPress={() => onPress(item)}
               testID={`buy-btn-${item.id}`}
             >
               <Text style={styles.buyText}>Buy!</Text>

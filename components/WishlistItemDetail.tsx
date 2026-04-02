@@ -1,6 +1,7 @@
-import React from "react";
+import React, { useEffect, useRef } from "react";
 import {
   Alert,
+  AppState,
   Image,
   Linking,
   Modal,
@@ -37,22 +38,48 @@ export default function WishlistItemDetail({
   onClose,
 }: WishlistItemDetailProps) {
   const isPurchased = item.purchasedAt != null;
+  const waitingForReturn = useRef(false);
+
+  // When user returns from external browser, show purchase confirmation
+  useEffect(() => {
+    const subscription = AppState.addEventListener("change", (nextState) => {
+      if (nextState === "active" && waitingForReturn.current) {
+        waitingForReturn.current = false;
+        Alert.alert("Did you complete the purchase?", `Mark "${item.name}" as purchased?`, [
+          { text: "Not yet", style: "cancel" },
+          {
+            text: "Yes, purchased!",
+            onPress: () => {
+              onPurchase(item.id);
+              onClose();
+            },
+          },
+        ]);
+      }
+    });
+    return () => subscription.remove();
+  }, [item, onPurchase, onClose]);
 
   const handlePurchase = () => {
-    Alert.alert(
-      "Buy this item?",
-      `Mark "${item.name}" as purchased for \u00A5${item.price.toLocaleString()}?`,
-      [
-        { text: "Cancel", style: "cancel" },
-        {
-          text: "Buy!",
-          onPress: () => {
-            onPurchase(item.id);
-            onClose();
+    if (item.productUrl) {
+      waitingForReturn.current = true;
+      Linking.openURL(item.productUrl);
+    } else {
+      Alert.alert(
+        "Buy this item?",
+        `Mark "${item.name}" as purchased for \u00A5${item.price.toLocaleString()}?`,
+        [
+          { text: "Cancel", style: "cancel" },
+          {
+            text: "Buy!",
+            onPress: () => {
+              onPurchase(item.id);
+              onClose();
+            },
           },
-        },
-      ],
-    );
+        ],
+      );
+    }
   };
 
   const handleDelete = () => {

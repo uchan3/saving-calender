@@ -5,6 +5,7 @@ import WishlistItemCard from "../../components/WishlistItemCard";
 import WishlistForm from "../../components/WishlistForm";
 import AddWishlistPicker from "../../components/AddWishlistPicker";
 import RakutenSearchModal from "../../components/RakutenSearchModal";
+import WishlistItemDetail from "../../components/WishlistItemDetail";
 import UnlockCelebration from "../../components/UnlockCelebration";
 import { useWishlist } from "../../hooks/useWishlist";
 import { useRecords } from "../../hooks/useRecords";
@@ -21,6 +22,7 @@ export default function WishlistScreen() {
   const [showForm, setShowForm] = useState(false);
   const [showSearch, setShowSearch] = useState(false);
   const [editItem, setEditItem] = useState<WishlistItem | undefined>(undefined);
+  const [detailItem, setDetailItem] = useState<WishlistItem | null>(null);
   const [celebrationItem, setCelebrationItem] = useState<WishlistItem | null>(null);
   const [knownUnlockedIds, setKnownUnlockedIds] = useState<Set<string>>(new Set());
 
@@ -104,6 +106,10 @@ export default function WishlistScreen() {
     [editItem, add, update],
   );
 
+  const handlePress = useCallback((item: WishlistItem) => {
+    setDetailItem(item);
+  }, []);
+
   const handleEdit = useCallback((item: WishlistItem) => {
     setEditItem(item);
     setShowForm(true);
@@ -129,6 +135,7 @@ export default function WishlistScreen() {
           item={item}
           unlocked={status.unlocked}
           progress={status.progress}
+          onPress={handlePress}
           onPurchase={purchase}
           onUnpurchase={unpurchase}
           onEdit={handleEdit}
@@ -136,7 +143,7 @@ export default function WishlistScreen() {
         />
       );
     },
-    [unlockStatus, purchase, unpurchase, handleEdit, remove],
+    [unlockStatus, handlePress, purchase, unpurchase, handleEdit, remove],
   );
 
   return (
@@ -215,6 +222,21 @@ export default function WishlistScreen() {
             editItem={editItem}
             onSubmit={handleSubmit}
             onCancel={handleCancel}
+          />
+        )}
+
+        {/* Item Detail Modal */}
+        {detailItem && (
+          <WishlistItemDetail
+            visible={detailItem != null}
+            item={detailItem}
+            unlocked={unlockStatus.get(detailItem.id)?.unlocked ?? false}
+            progress={unlockStatus.get(detailItem.id)?.progress ?? 0}
+            onPurchase={purchase}
+            onUnpurchase={unpurchase}
+            onEdit={handleEdit}
+            onDelete={remove}
+            onClose={() => setDetailItem(null)}
           />
         )}
 

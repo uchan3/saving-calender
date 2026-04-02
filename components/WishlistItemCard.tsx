@@ -7,6 +7,7 @@ interface WishlistItemCardProps {
   item: WishlistItem;
   unlocked: boolean;
   progress: number;
+  onPress: (item: WishlistItem) => void;
   onPurchase: (id: string) => void;
   onUnpurchase: (id: string) => void;
   onEdit: (item: WishlistItem) => void;
@@ -17,6 +18,7 @@ export default function WishlistItemCard({
   item,
   unlocked,
   progress,
+  onPress,
   onPurchase,
   onUnpurchase,
   onEdit,
@@ -44,7 +46,11 @@ export default function WishlistItemCard({
 
   if (isPurchased) {
     return (
-      <View style={[styles.card, styles.purchasedCard]} testID={`wishlist-item-${item.id}`}>
+      <TouchableOpacity
+        style={[styles.card, styles.purchasedCard]}
+        testID={`wishlist-item-${item.id}`}
+        onPress={() => onPress(item)}
+      >
         <View style={styles.row}>
           <Text style={styles.purchasedIcon}>&#x1F6D2;</Text>
           <View style={styles.info}>
@@ -59,13 +65,17 @@ export default function WishlistItemCard({
             <Text style={styles.undoText}>Undo</Text>
           </TouchableOpacity>
         </View>
-      </View>
+      </TouchableOpacity>
     );
   }
 
   if (unlocked) {
     return (
-      <View style={[styles.card, styles.unlockedCard]} testID={`wishlist-item-${item.id}`}>
+      <TouchableOpacity
+        style={[styles.card, styles.unlockedCard]}
+        testID={`wishlist-item-${item.id}`}
+        onPress={() => onPress(item)}
+      >
         <View style={styles.row}>
           <Text style={styles.unlockedIcon}>&#x1F513;</Text>
           <View style={styles.info}>
@@ -88,13 +98,17 @@ export default function WishlistItemCard({
             </TouchableOpacity>
           </View>
         </View>
-      </View>
+      </TouchableOpacity>
     );
   }
 
   // Locked state
   return (
-    <View style={[styles.card, styles.lockedCard]} testID={`wishlist-item-${item.id}`}>
+    <TouchableOpacity
+      style={[styles.card, styles.lockedCard]}
+      testID={`wishlist-item-${item.id}`}
+      onPress={() => onPress(item)}
+    >
       <View style={styles.row}>
         <Text style={styles.lockedIcon}>&#x1F512;</Text>
         <View style={styles.info}>
@@ -116,7 +130,7 @@ export default function WishlistItemCard({
         </View>
         <Text style={styles.progressText}>{progress}%</Text>
       </View>
-    </View>
+    </TouchableOpacity>
   );
 }
 
